@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setup Guide – RentMyStuff Backend</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f6ff; color: #1a1a1a; padding: 2rem 1rem; }
+  .container { max-width: 760px; margin: 0 auto; }
+  h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+  .subtitle { font-size: 15px; color: #666; margin-bottom: 2rem; }
+  .step { background: #fff; border-radius: 16px; border: 1px solid #e4edf8; margin-bottom: 1rem; overflow: hidden; }
+  .step-header { display: flex; align-items: center; gap: 14px; padding: 1.1rem 1.5rem; cursor: pointer; user-select: none; }
+  .step-header:hover { background: #f9fbff; }
+  .step-num { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; }
+  .num-done { background: #E1F5EE; color: #085041; }
+  .num-active { background: #185FA5; color: #fff; }
+  .num-pending { background: #f0f0f0; color: #aaa; }
+  .step-title { font-size: 16px; font-weight: 600; flex: 1; }
+  .step-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+  .badge-done { background: #E1F5EE; color: #085041; }
+  .badge-active { background: #E6F1FB; color: #0C447C; }
+  .badge-pending { background: #f4f4f4; color: #999; }
+  .chevron { font-size: 14px; color: #aaa; transition: transform 0.2s; }
+  .chevron.open { transform: rotate(180deg); }
+  .step-body { display: none; padding: 0 1.5rem 1.5rem; border-top: 1px solid #f5f5f5; }
+  .step-body.open { display: block; }
+  .step-body p { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 1rem; margin-top: 1rem; }
+  .code-block { background: #1a1a2e; color: #e0e0e0; border-radius: 10px; padding: 1rem 1.25rem; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.7; margin-bottom: 1rem; overflow-x: auto; position: relative; }
+  .code-block .comment { color: #6a9fb5; }
+  .code-block .key { color: #f8c555; }
+  .code-block .val { color: #7ec699; }
+  .code-block .cmd { color: #79dcaa; }
+  .copy-btn { position: absolute; top: 8px; right: 10px; background: rgba(255,255,255,0.1); color: #ccc; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; }
+  .copy-btn:hover { background: rgba(255,255,255,0.2); }
+  .tip { background: #FFF8E6; border: 1px solid #F5D98B; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #7A5C00; margin-bottom: 1rem; display: flex; gap: 8px; line-height: 1.6; }
+  .info { background: #E6F1FB; border: 1px solid #B5D4F4; border-radius: 10px; padding: 10px 14px; font-size: 13px; color: #0C447C; margin-bottom: 1rem; display: flex; gap: 8px; line-height: 1.6; }
+  .link-btn { display: inline-flex; align-items: center; gap: 6px; background: #185FA5; color: #fff; text-decoration: none; padding: 9px 18px; border-radius: 9px; font-size: 13px; font-weight: 600; margin-bottom: 10px; margin-right: 8px; }
+  .link-btn.outline { background: transparent; color: #185FA5; border: 1px solid #185FA5; }
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #444; padding: 5px 0; }
+  .checklist li::before { content: '✅'; flex-shrink: 0; font-size: 14px; }
+  .env-row { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f5f5f5; align-items: start; }
+  .env-row:last-child { border-bottom: none; }
+  .env-key { font-family: monospace; font-weight: 600; color: #185FA5; }
+  .env-desc { color: #555; line-height: 1.5; }
+  .flow { display: flex; align-items: center; gap: 0; flex-wrap: wrap; margin: 1rem 0; }
+  .flow-step { background: #E6F1FB; color: #0C447C; font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 999px; white-space: nowrap; }
+  .flow-arrow { color: #aaa; margin: 0 6px; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🚀 RentMyStuff Backend Setup Guide</h1>
+  <p class="subtitle">Follow these 6 steps in order. Each step builds on the previous one.</p>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-active">1</div>
+      <div class="step-title">Install Node.js on your computer</div>
+      <div class="step-badge badge-active">Start here</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body open">
+      <p>Node.js is the engine that runs your backend server. You need version 18 or higher.</p>
+      <a class="link-btn" href="https://nodejs.org" target="_blank">⬇ Download Node.js (LTS)</a>
+      <p>After installing, open <strong>Terminal</strong> (Mac/Linux) or <strong>Command Prompt</strong> (Windows) and verify:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <span class="cmd">node --version</span>   <span class="comment"># should show v18.x or higher</span>
+<span class="cmd">npm --version</span>    <span class="comment"># should show 9.x or higher</span>
+      </div>
+      <div class="tip">⚠️ If you see "command not found" — restart your terminal after installing Node.js</div>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-pending">2</div>
+      <div class="step-title">Set up the project and install packages</div>
+      <div class="step-badge badge-pending">5 min</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body">
+      <p>Extract the ZIP file you downloaded. Open terminal <strong>inside the rentmystuff-backend folder</strong> and run:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <span class="cmd">npm install</span>   <span class="comment"># installs express, mongoose, razorpay, etc.</span>
+      </div>
+      <p>You'll see a <code>node_modules</code> folder appear. That means it worked. ✅</p>
+      <div class="tip">⚠️ If you get errors, make sure you're inside the correct folder — it should have package.json in it</div>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-pending">3</div>
+      <div class="step-title">Create free MongoDB Atlas database</div>
+      <div class="step-badge badge-pending">10 min</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body">
+      <p>MongoDB Atlas is a free cloud database — no credit card needed.</p>
+      <a class="link-btn" href="https://cloud.mongodb.com" target="_blank">🍃 Open MongoDB Atlas</a>
+      <p><strong>Follow these steps inside Atlas:</strong></p>
+      <ul class="checklist">
+        <li>Click "Try Free" and create an account</li>
+        <li>Choose "Create a cluster" → select <strong>M0 Free tier</strong></li>
+        <li>Pick any cloud region (Mumbai is fastest for India)</li>
+        <li>Wait ~2 minutes for the cluster to be created</li>
+        <li>Click <strong>"Connect"</strong> → "Connect your application"</li>
+        <li>Copy the connection string — looks like: <code>mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/</code></li>
+        <li>Go to <strong>Network Access</strong> → Add IP Address → Allow from Anywhere <code>0.0.0.0/0</code></li>
+        <li>Go to <strong>Database Access</strong> → Add user with username & password</li>
+      </ul>
+      <div class="info">💡 In your connection string, replace <code>&lt;password&gt;</code> with the actual password you set. Also add <code>rentmystuff</code> as the database name before the <code>?</code></div>
+      <p>Your final MONGO_URI should look like:</p>
+      <div class="code-block">mongodb+srv://<span class="key">rahul</span>:<span class="val">mypassword123</span>@cluster0.abc12.mongodb.net/<span class="val">rentmystuff</span>?retryWrites=true&w=majority</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-pending">4</div>
+      <div class="step-title">Get Razorpay test API keys</div>
+      <div class="step-badge badge-pending">5 min</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body">
+      <p>Razorpay gives you test keys to develop with — no real money moves until you go live.</p>
+      <a class="link-btn" href="https://dashboard.razorpay.com/signup" target="_blank">💳 Create Razorpay Account</a>
+      <p><strong>Get your test keys:</strong></p>
+      <ul class="checklist">
+        <li>Log in to Razorpay Dashboard</li>
+        <li>Go to <strong>Settings → API Keys</strong></li>
+        <li>Make sure you're in <strong>Test Mode</strong> (toggle at top right)</li>
+        <li>Click <strong>"Generate Test Key"</strong></li>
+        <li>Copy both <strong>Key ID</strong> and <strong>Key Secret</strong></li>
+      </ul>
+      <div class="info">💡 Test keys start with <code>rzp_test_</code>. Use these during development — they won't charge real money. Switch to live keys only when you're ready to launch.</div>
+      <p>Your keys will look like this:</p>
+      <div class="code-block">
+<span class="key">RAZORPAY_KEY_ID</span>=<span class="val">rzp_test_AbCdEfGh12345678</span>
+<span class="key">RAZORPAY_KEY_SECRET</span>=<span class="val">xYzAbCdEfGhIjKlMnOpQrSt</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-pending">5</div>
+      <div class="step-title">Create your .env file</div>
+      <div class="step-badge badge-pending">5 min</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body">
+      <p>The <code>.env</code> file holds all your secret keys. <strong>Never share this file or commit it to GitHub.</strong></p>
+      <p>Inside your project folder, create a file named exactly <code>.env</code> (with the dot) and paste this:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<span class="comment"># Server</span>
+<span class="key">PORT</span>=<span class="val">5000</span>
+<span class="key">NODE_ENV</span>=<span class="val">development</span>
+
+<span class="comment"># MongoDB — paste your connection string here</span>
+<span class="key">MONGO_URI</span>=<span class="val">mongodb+srv://youruser:yourpassword@cluster0.xxxxx.mongodb.net/rentmystuff?retryWrites=true&w=majority</span>
+
+<span class="comment"># JWT Secret — any long random string</span>
+<span class="key">JWT_SECRET</span>=<span class="val">rentmystuff_super_secret_key_2025_change_this</span>
+<span class="key">JWT_EXPIRE</span>=<span class="val">30d</span>
+
+<span class="comment"># Razorpay keys (from dashboard.razorpay.com)</span>
+<span class="key">RAZORPAY_KEY_ID</span>=<span class="val">rzp_test_your_key_id_here</span>
+<span class="key">RAZORPAY_KEY_SECRET</span>=<span class="val">your_razorpay_secret_here</span>
+
+<span class="comment"># Frontend URL</span>
+<span class="key">FRONTEND_URL</span>=<span class="val">http://localhost:3000</span>
+      </div>
+      <div class="tip">⚠️ Replace every placeholder with your real values from Steps 3 and 4</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step">
+    <div class="step-header" onclick="toggle(this)">
+      <div class="step-num num-pending">6</div>
+      <div class="step-title">Verify connections and start the server</div>
+      <div class="step-badge badge-pending">Final step!</div>
+      <div class="chevron">▼</div>
+    </div>
+    <div class="step-body">
+      <p>First, run the connection checker to make sure everything is set up correctly:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <span class="cmd">node check-connection.js</span>
+      </div>
+      <p>You should see all ✅ green. If anything shows ❌, it will tell you exactly how to fix it.</p>
+      <p>Once everything is green, start the server:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <span class="cmd">npm run dev</span>   <span class="comment"># starts server + auto-restarts on changes</span>
+      </div>
+      <p>You should see:</p>
+      <div class="code-block">
+<span class="val">🚀 RentMyStuff server running on http://localhost:5000</span>
+<span class="val">✅ MongoDB connected successfully</span>
+      </div>
+      <p>Then run the API tests to verify everything works:</p>
+      <div class="code-block">
+        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <span class="cmd">node test-api.js</span>
+      </div>
+      <div class="info">💡 Open <strong>http://localhost:5000</strong> in your browser — you should see the API welcome message</div>
+    </div>
+  </div>
+
+  <!-- PAYMENT FLOW DIAGRAM -->
+  <div style="background:#fff;border-radius:16px;border:1px solid #e4edf8;padding:1.5rem;margin-top:1rem">
+    <div style="font-size:16px;font-weight:700;margin-bottom:1rem">💳 How the Razorpay payment flow works</div>
+    <div class="flow">
+      <div class="flow-step">1. Renter clicks Pay</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">2. Backend creates order</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">3. Razorpay popup opens</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">4. User pays (UPI/card)</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">5. Backend verifies signature</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step">6. Booking confirmed + OTP sent</div>
+    </div>
+    <div style="margin-top:1rem;font-size:13px;color:#666;line-height:1.7">
+      The signature verification in <strong>Step 5</strong> is critical — it prevents fake payment confirmations. Razorpay signs each payment with your secret key, and our backend verifies it using HMAC-SHA256 before confirming the booking.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.chevron');
+    body.classList.toggle('open');
+    chevron.classList.toggle('open');
+  }
+
+  function copyCode(btn) {
+    const block = btn.parentElement;
+    const text = block.innerText.replace('Copy', '').trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+  }
+</script>
+</body>
+</html>

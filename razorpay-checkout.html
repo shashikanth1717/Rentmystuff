@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pay & Book – RentMyStuff</title>
+<!-- Load Razorpay checkout script — REQUIRED -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f6ff; color: #1a1a1a; }
+  .container { max-width: 480px; margin: 3rem auto; padding: 0 1rem; }
+  .card { background: #fff; border-radius: 18px; border: 1px solid #e4edf8; padding: 2rem; margin-bottom: 1rem; }
+  h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .sub { font-size: 14px; color: #888; margin-bottom: 1.5rem; }
+  .item-row { display: flex; gap: 12px; background: #f9fbff; border-radius: 12px; padding: 12px; margin-bottom: 1.25rem; border: 1px solid #e4edf8; }
+  .item-icon { font-size: 32px; }
+  .item-title { font-size: 15px; font-weight: 600; }
+  .item-dates { font-size: 13px; color: #777; margin-top: 3px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-bottom: 1.25rem; }
+  .price-table td { padding: 7px 0; font-size: 14px; border-bottom: 1px solid #f5f5f5; }
+  .price-table td:last-child { text-align: right; font-weight: 500; }
+  .price-table tr:last-child td { border-bottom: none; font-size: 16px; font-weight: 700; color: #185FA5; }
+  .pay-btn { width: 100%; background: #185FA5; color: #fff; border: none; padding: 15px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: background 0.2s; }
+  .pay-btn:hover { background: #0C447C; }
+  .pay-btn:disabled { background: #a0bfdf; cursor: not-allowed; }
+  .secure { text-align: center; font-size: 12px; color: #aaa; margin-top: 10px; }
+  .pay-icons { display: flex; gap: 8px; justify-content: center; margin-top: 8px; flex-wrap: wrap; }
+  .pay-icon { background: #f4f7fb; border: 1px solid #e4edf8; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #555; }
+  .status-box { border-radius: 12px; padding: 1.25rem; text-align: center; margin-bottom: 1rem; }
+  .status-success { background: #e8f8ee; border: 1px solid #9FE1CB; }
+  .status-error { background: #ffeeee; border: 1px solid #F09595; }
+  .status-icon { font-size: 40px; margin-bottom: 8px; }
+  .status-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .status-msg { font-size: 14px; color: #555; line-height: 1.6; }
+  .otp-box { background: #E6F1FB; border-radius: 10px; padding: 12px; margin-top: 12px; }
+  .otp-label { font-size: 12px; color: #555; margin-bottom: 4px; }
+  .otp-code { font-size: 28px; font-weight: 700; color: #185FA5; letter-spacing: 8px; }
+  .btn-secondary { width: 100%; background: #f4f7fb; color: #555; border: 1px solid #dde3ee; padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+  .loader { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #status-area { display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- BOOKING SUMMARY CARD -->
+  <div class="card">
+    <h2>Complete your booking</h2>
+    <p class="sub">You're one step away from confirming your rental</p>
+
+    <div class="item-row">
+      <div class="item-icon">📷</div>
+      <div>
+        <div class="item-title" id="display-item-title">Canon EOS 200D DSLR</div>
+        <div class="item-dates" id="display-dates">Apr 25 – Apr 28 · 3 days</div>
+        <div class="item-dates" id="display-owner">Owner: Priya K. · Jubilee Hills</div>
+      </div>
+    </div>
+
+    <table class="price-table">
+      <tr><td style="color:#666">₹600 × <span id="display-days">3</span> days</td><td id="display-rental">₹1,800</td></tr>
+      <tr><td style="color:#666">Platform fee (10%)</td><td id="display-fee" style="color:#e05">−₹180</td></tr>
+      <tr><td style="color:#666">Security deposit (refundable)</td><td id="display-deposit">₹1,000</td></tr>
+      <tr><td>Total payable</td><td id="display-total">₹2,620</td></tr>
+    </table>
+
+    <button class="pay-btn" id="pay-btn" onclick="startPayment()">
+      <span id="pay-btn-text">🔒 Pay ₹2,620 securely</span>
+      <div class="loader" id="pay-loader" style="display:none"></div>
+    </button>
+
+    <p class="secure">🔒 Secured by Razorpay · 256-bit SSL encryption</p>
+    <div class="pay-icons">
+      <div class="pay-icon">UPI</div>
+      <div class="pay-icon">Visa</div>
+      <div class="pay-icon">Mastercard</div>
+      <div class="pay-icon">Net banking</div>
+      <div class="pay-icon">Wallets</div>
+    </div>
+  </div>
+
+  <!-- STATUS AREA — shown after payment -->
+  <div id="status-area">
+
+    <!-- SUCCESS -->
+    <div class="card status-box status-success" id="success-box" style="display:none">
+      <div class="status-icon">🎉</div>
+      <div class="status-title" style="color:#085041">Booking confirmed!</div>
+      <div class="status-msg">
+        Payment of <strong id="success-amount"></strong> received.<br>
+        Your booking is confirmed. Show the OTP to the owner at pickup.
+      </div>
+      <div class="otp-box">
+        <div class="otp-label">📱 Handover OTP — show to owner</div>
+        <div class="otp-code" id="otp-display">----</div>
+        <div class="otp-label" style="margin-top:6px">Keep this safe. Valid for this booking only.</div>
+      </div>
+      <button class="btn-secondary" onclick="window.location.href='dashboard.html'">Go to My Bookings →</button>
+    </div>
+
+    <!-- FAILURE -->
+    <div class="card status-box status-error" id="error-box" style="display:none">
+      <div class="status-icon">❌</div>
+      <div class="status-title" style="color:#791F1F">Payment failed</div>
+      <div class="status-msg" id="error-msg">Something went wrong. Your money was not deducted. Please try again.</div>
+      <button class="btn-secondary" onclick="retryPayment()">Try again</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────────
+  // Change this to your actual backend URL
+  const API_BASE = 'http://localhost:5000/api';
+
+  // These values will come from the previous page (item detail page)
+  // For now they are hardcoded as demo — replace with real data
+  const BOOKING_DATA = {
+    bookingId:   'BOOKING_ID_FROM_PREVIOUS_PAGE', // e.g. passed via URL param
+    itemTitle:   'Canon EOS 200D DSLR',
+    startDate:   '2025-04-25',
+    endDate:     '2025-04-28',
+    totalDays:   3,
+    pricePerDay: 600,
+    rentalCost:  1800,
+    platformFee: 180,
+    deposit:     1000,
+    totalPayable: 2620,
+    ownerName:   'Priya K.',
+    ownerCity:   'Jubilee Hills',
+  };
+
+  // Get user token from localStorage (set during login)
+  const USER_TOKEN = localStorage.getItem('rms_token') || 'YOUR_JWT_TOKEN_HERE';
+
+  // ── UPDATE DISPLAY ──────────────────────────────────────
+  function updateDisplay() {
+    document.getElementById('display-item-title').textContent = BOOKING_DATA.itemTitle;
+    document.getElementById('display-dates').textContent =
+      `${BOOKING_DATA.startDate} – ${BOOKING_DATA.endDate} · ${BOOKING_DATA.totalDays} days`;
+    document.getElementById('display-owner').textContent =
+      `Owner: ${BOOKING_DATA.ownerName} · ${BOOKING_DATA.ownerCity}`;
+    document.getElementById('display-days').textContent = BOOKING_DATA.totalDays;
+    document.getElementById('display-rental').textContent = `₹${BOOKING_DATA.rentalCost.toLocaleString()}`;
+    document.getElementById('display-fee').textContent = `−₹${BOOKING_DATA.platformFee.toLocaleString()}`;
+    document.getElementById('display-deposit').textContent = `₹${BOOKING_DATA.deposit.toLocaleString()}`;
+    document.getElementById('display-total').textContent = `₹${BOOKING_DATA.totalPayable.toLocaleString()}`;
+    document.getElementById('pay-btn-text').textContent = `🔒 Pay ₹${BOOKING_DATA.totalPayable.toLocaleString()} securely`;
+  }
+
+  // ── STEP 1: Create order on our backend ─────────────────
+  async function startPayment() {
+    setLoading(true);
+
+    try {
+      // Call our backend to create a Razorpay order
+      const res = await fetch(`${API_BASE}/payments/create-order`, {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${USER_TOKEN}`,
+        },
+        body: JSON.stringify({ bookingId: BOOKING_DATA.bookingId }),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (!data.success) {
+        showError(data.message || 'Could not create payment order. Try again.');
+        return;
+      }
+
+      // Step 2: Open Razorpay checkout popup
+      openRazorpayPopup(data);
+
+    } catch (err) {
+      setLoading(false);
+      showError('Network error. Make sure your server is running at ' + API_BASE);
+      console.error(err);
+    }
+  }
+
+  // ── STEP 2: Open Razorpay payment popup ─────────────────
+  function openRazorpayPopup(orderData) {
+    const options = {
+      // Your Razorpay key ID (public — safe to use on frontend)
+      key: orderData.keyId,
+
+      // Amount in paise
+      amount: orderData.amount * 100,
+
+      currency: 'INR',
+
+      // Shown in popup header
+      name:        'RentMyStuff',
+      description: orderData.description,
+      image:       'https://your-logo-url.com/logo.png', // Optional: your logo
+
+      // The order ID from our backend
+      order_id: orderData.orderId,
+
+      // Called when payment is SUCCESSFUL
+      handler: function(response) {
+        // response contains: razorpay_order_id, razorpay_payment_id, razorpay_signature
+        verifyPayment(response, orderData.bookingId);
+      },
+
+      // Pre-fill user details
+      prefill: {
+        name:    orderData.prefill?.name    || '',
+        email:   orderData.prefill?.email   || '',
+        contact: orderData.prefill?.contact || '',
+      },
+
+      // Supported payment methods
+      method: {
+        upi:        true,
+        card:       true,
+        netbanking: true,
+        wallet:     true,
+        emi:        false,
+      },
+
+      // UI customization
+      theme:  { color: '#185FA5' },
+      modal: {
+        // Called when user closes the popup WITHOUT paying
+        ondismiss: function() {
+          console.log('User closed payment popup');
+          setLoading(false);
+        },
+      },
+    };
+
+    const rzp = new Razorpay(options);
+
+    // Handle payment failure inside popup (wrong card etc.)
+    rzp.on('payment.failed', function(response) {
+      showError(`Payment failed: ${response.error.description}`);
+    });
+
+    rzp.open();
+  }
+
+  // ── STEP 3: Verify payment on our backend ───────────────
+  async function verifyPayment(razorpayResponse, bookingId) {
+    setLoading(true);
+    document.getElementById('pay-btn-text').textContent = 'Verifying payment...';
+
+    try {
+      const res = await fetch(`${API_BASE}/payments/verify`, {
+        method:  'POST',
+        headers: {
+          'Content-Type':  'application/json',
+          'Authorization': `Bearer ${USER_TOKEN}`,
+        },
+        body: JSON.stringify({
+          bookingId,
+          razorpay_order_id:   razorpayResponse.razorpay_order_id,
+          razorpay_payment_id: razorpayResponse.razorpay_payment_id,
+          razorpay_signature:  razorpayResponse.razorpay_signature,
+        }),
+      });
+
+      const data = await res.json();
+      setLoading(false);
+
+      if (data.success) {
+        showSuccess(data);
+      } else {
+        showError(data.message || 'Payment verification failed.');
+      }
+    } catch (err) {
+      setLoading(false);
+      showError('Could not verify payment. Please contact support.');
+      console.error(err);
+    }
+  }
+
+  // ── UI HELPERS ──────────────────────────────────────────
+  function setLoading(on) {
+    const btn = document.getElementById('pay-btn');
+    const txt = document.getElementById('pay-btn-text');
+    const ldr = document.getElementById('pay-loader');
+    btn.disabled = on;
+    txt.style.display = on ? 'none' : 'block';
+    ldr.style.display = on ? 'block' : 'none';
+  }
+
+  function showSuccess(data) {
+    document.getElementById('status-area').style.display = 'block';
+    document.getElementById('success-box').style.display = 'block';
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('success-amount').textContent = `₹${(data.amountPaid || BOOKING_DATA.totalPayable).toLocaleString()}`;
+    document.getElementById('otp-display').textContent = data.handoverOtp || '----';
+    document.querySelector('.card:first-child').style.opacity = '0.5';
+    document.querySelector('.card:first-child').style.pointerEvents = 'none';
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  function showError(msg) {
+    document.getElementById('status-area').style.display = 'block';
+    document.getElementById('error-box').style.display = 'block';
+    document.getElementById('success-box').style.display = 'none';
+    document.getElementById('error-msg').textContent = msg;
+  }
+
+  function retryPayment() {
+    document.getElementById('status-area').style.display = 'none';
+    document.getElementById('error-box').style.display = 'none';
+    document.querySelector('.card:first-child').style.opacity = '1';
+    document.querySelector('.card:first-child').style.pointerEvents = 'auto';
+  }
+
+  // Initialize
+  updateDisplay();
+</script>
+</body>
+</html>
