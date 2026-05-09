@@ -3,7 +3,9 @@
 Complete Node.js + Express + MongoDB backend for the RentMyStuff peer-to-peer rental platform.
 
 
+## Demo Video
 
+[▶ Watch Demo](assets/videos/screenrecord.mp4)
 
 ---
 
